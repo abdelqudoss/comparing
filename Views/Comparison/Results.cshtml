@@ -1,0 +1,248 @@
+@model ExcelCompare.Application.Interfaces.ComparisonResult
+
+@{
+    ViewData["Title"] = "Comparison Results";
+    var totalRecords = Model.NewRecords.Count + Model.MissingRecords.Count + Model.ChangedRecords.Count + Model.UnchangedCount;
+}
+
+<div class="container mt-4">
+    <h2>Comparison Results</h2>
+    <p>Comparing Sent Batch #@Model.SentBatchId with Received Batch #@Model.ReceivedBatchId</p>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Missing in Received</h5>
+                    <h3>@Model.MissingRecords.Count</h3>
+                    <small>Keys in Sent but NOT in Received</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Missing in Sent</h5>
+                    <h3>@Model.NewRecords.Count</h3>
+                    <small>Keys in Received but NOT in Sent</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Changed Records</h5>
+                    <h3>@Model.ChangedRecords.Count</h3>
+                    <small>Same key, data changed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Summary</h5>
+                    <p><strong>Total Keys in Sent:</strong> @(Model.MissingRecords.Count + Model.ChangedRecords.Count + Model.UnchangedCount)</p>
+                    <p><strong>Total Keys in Received:</strong> @(Model.NewRecords.Count + Model.ChangedRecords.Count + Model.UnchangedCount)</p>
+                    <p><strong>Matching Keys (Unchanged Data):</strong> @Model.UnchangedCount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="comparisonTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="missing-received-tab" data-bs-toggle="tab" data-bs-target="#missing-received" type="button">
+                Missing in Received (@Model.MissingRecords.Count)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="missing-sent-tab" data-bs-toggle="tab" data-bs-target="#missing-sent" type="button">
+                Missing in Sent (@Model.NewRecords.Count)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="changed-tab" data-bs-toggle="tab" data-bs-target="#changed" type="button">
+                Changed (@Model.ChangedRecords.Count)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3" id="comparisonTabsContent">
+        <div class="tab-pane fade show active" id="missing-received" role="tabpanel">
+            <h4>Missing in Received (Keys exist in Sent but NOT in Received)</h4>
+            <p class="text-muted">These records exist in the Sent file but are missing from the Received file.</p>
+            @if (Model.MissingRecords.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm table-hover">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Mem</th>
+                                <th>Nid</th>
+                                <th>Sn</th>
+                                <th>Phone</th>
+                                <th>Full Name</th>
+                                <th>Reg Date</th>
+                                <th>Batch No</th>
+                                <th>Member Rank</th>
+                                <th>Ref Sn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.MissingRecords.Take(500))
+                            {
+                                <tr>
+                                    <td><strong>@record.Mem</strong></td>
+                                    <td><strong>@record.Nid</strong></td>
+                                    <td>@record.Sn</td>
+                                    <td>@record.Phone</td>
+                                    <td>@record.FullName</td>
+                                    <td>@record.RegDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@record.BatchNo</td>
+                                    <td>@record.MemberRank</td>
+                                    <td>@record.RefSn</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (Model.MissingRecords.Count > 500)
+                    {
+                        <p class="text-muted">Showing first 500 of @Model.MissingRecords.Count records</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success">✓ All Sent records exist in Received</div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="missing-sent" role="tabpanel">
+            <h4>Missing in Sent (Keys exist in Received but NOT in Sent)</h4>
+            <p class="text-muted">These records exist in the Received file but are missing from the Sent file.</p>
+            @if (Model.NewRecords.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm table-hover">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Mem</th>
+                                <th>Nid</th>
+                                <th>Sn</th>
+                                <th>Phone</th>
+                                <th>Full Name</th>
+                                <th>Reg Date</th>
+                                <th>Batch No</th>
+                                <th>Member Rank</th>
+                                <th>Ref Sn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.NewRecords.Take(500))
+                            {
+                                <tr>
+                                    <td><strong>@record.Mem</strong></td>
+                                    <td><strong>@record.Nid</strong></td>
+                                    <td>@record.Sn</td>
+                                    <td>@record.Phone</td>
+                                    <td>@record.FullName</td>
+                                    <td>@record.RegDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@record.BatchNo</td>
+                                    <td>@record.MemberRank</td>
+                                    <td>@record.RefSn</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (Model.NewRecords.Count > 500)
+                    {
+                        <p class="text-muted">Showing first 500 of @Model.NewRecords.Count records</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success">✓ All Received records exist in Sent</div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="changed" role="tabpanel">
+            <h4>Changed Records (Same Key, Different Data)</h4>
+            <p class="text-muted">Records with same Mem+Nid key but member_rank or ref_sn changed between Sent and Received.</p>
+            @if (Model.ChangedRecords.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm table-hover">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Mem</th>
+                                <th>Nid</th>
+                                <th>Sn</th>
+                                <th>Phone</th>
+                                <th>Full Name</th>
+                                <th>Reg Date</th>
+                                <th>Batch No</th>
+                                <th>Member Rank<br/><small>(Received)</small></th>
+                                <th>Member Rank<br/><small>(Sent)</small></th>
+                                <th>Ref Sn<br/><small>(Received)</small></th>
+                                <th>Ref Sn<br/><small>(Sent)</small></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.ChangedRecords.Take(500))
+                            {
+                                <tr>
+                                    <td><strong>@record.Mem</strong></td>
+                                    <td><strong>@record.Nid</strong></td>
+                                    <td>@record.Sn</td>
+                                    <td>@record.Phone</td>
+                                    <td>@record.FullName</td>
+                                    <td>@record.RegDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@record.BatchNo</td>
+                                    <td>
+                                        @if (record.MemberRank != record.OldMemberRank)
+                                        {
+                                            <span class="badge bg-warning text-dark">@record.MemberRank</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@record.MemberRank</span>
+                                        }
+                                    </td>
+                                    <td><small class="text-muted">@record.OldMemberRank</small></td>
+                                    <td>
+                                        @if (record.RefSn != record.OldRefSn)
+                                        {
+                                            <span class="badge bg-warning text-dark">@record.RefSn</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@record.RefSn</span>
+                                        }
+                                    </td>
+                                    <td><small class="text-muted">@record.OldRefSn</small></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (Model.ChangedRecords.Count > 500)
+                    {
+                        <p class="text-muted">Showing first 500 of @Model.ChangedRecords.Count records</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success">✓ No data changes detected for matching keys</div>
+            }
+        </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Comparison</a>
+    </div>
+</div>

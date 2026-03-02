@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Excel Compare System</h1>
+        <p class="lead">High-performance Excel file comparison for large datasets (up to 2M rows)</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">📤 Upload Files</h3>
+                    <p class="card-text">Upload your Sent and Received Excel files. The system handles large files efficiently using streaming and bulk operations.</p>
+                    <ul>
+                        <li>Supports up to 2,000,000 rows</li>
+                        <li>Streaming Excel reader</li>
+                        <li>Bulk database insertion</li>
+                        <li>Progress tracking</li>
+                    </ul>
+                    <a asp-controller="Upload" asp-action="Index" class="btn btn-primary">Go to Upload</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">🔍 Compare Data</h3>
+                    <p class="card-text">Compare Sent vs Received batches to identify differences in your data.</p>
+                    <ul>
+                        <li>New records detection</li>
+                        <li>Missing records identification</li>
+                        <li>Changed records tracking</li>
+                        <li>SQL-based comparison engine</li>
+                    </ul>
+                    <a asp-controller="Comparison" asp-action="Index" class="btn btn-success">Go to Compare</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4>System Features</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Performance Optimized</h5>
+                            <ul>
+                                <li>SqlBulkCopy for fast inserts</li>
+                                <li>Streaming file reading</li>
+                                <li>Batch processing</li>
+                                <li>Indexed database queries</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Comparison Logic</h5>
+                            <ul>
+                                <li>Composite key: mem + nid</li>
+                                <li>Track changes in member_rank</li>
+                                <li>Track changes in ref_sn</li>
+                                <li>SQL JOIN-based detection</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Architecture</h5>
+                            <ul>
+                                <li>Clean layered architecture</li>
+                                <li>Repository pattern</li>
+                                <li>Dependency injection</li>
+                                <li>Entity Framework Core</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

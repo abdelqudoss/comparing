@@ -1,0 +1,124 @@
+@model IEnumerable<ExcelCompare.Domain.Entities.UploadBatch>
+
+@{
+    ViewData["Title"] = "Compare Batches";
+    var sentBatches = Model?.Where(b => b.FileType == "Sent").ToList() ?? new List<ExcelCompare.Domain.Entities.UploadBatch>();
+    var receivedBatches = Model?.Where(b => b.FileType == "Received").ToList() ?? new List<ExcelCompare.Domain.Entities.UploadBatch>();
+}
+
+<div class="container mt-4">
+    <h2>Compare Batches</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Compare Latest Batches</h5>
+                    <p class="card-text">Compare the most recent Sent and Received batches</p>
+                    <form asp-action="CompareLatest" method="post">
+                        <button type="submit" class="btn btn-primary">Compare Latest</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Compare Selected Batches</h5>
+                    <form asp-action="CompareSelected" method="post">
+                        <div class="mb-3">
+                            <label for="sentBatchId" class="form-label">Sent Batch</label>
+                            <select class="form-select" id="sentBatchId" name="sentBatchId" required>
+                                <option value="">Select Sent Batch</option>
+                                @foreach (var batch in sentBatches)
+                                {
+                                    <option value="@batch.Id">
+                                        [@batch.Id] @batch.FileName - @batch.UploadedAt.ToString("yyyy-MM-dd") (@batch.TotalRows rows)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="receivedBatchId" class="form-label">Received Batch</label>
+                            <select class="form-select" id="receivedBatchId" name="receivedBatchId" required>
+                                <option value="">Select Received Batch</option>
+                                @foreach (var batch in receivedBatches)
+                                {
+                                    <option value="@batch.Id">
+                                        [@batch.Id] @batch.FileName - @batch.UploadedAt.ToString("yyyy-MM-dd") (@batch.TotalRows rows)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Compare Selected</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Available Batches</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Sent Batches</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Date</th>
+                            <th>Rows</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var batch in sentBatches)
+                        {
+                            <tr>
+                                <td>@batch.Id</td>
+                                <td>@batch.FileName</td>
+                                <td>@batch.UploadedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@batch.TotalRows.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h5>Received Batches</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Date</th>
+                            <th>Rows</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var batch in receivedBatches)
+                        {
+                            <tr>
+                                <td>@batch.Id</td>
+                                <td>@batch.FileName</td>
+                                <td>@batch.UploadedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@batch.TotalRows.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+@model IEnumerable<ExcelCompare.Domain.Entities.UploadBatch>
+
+@{
+    ViewData["Title"] = "Upload Excel Files";
+}
+
+<div class="container mt-4">
+    <h2>Upload Excel Files</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Upload New File</h5>
+            <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="file" class="form-label">Select Excel File</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.xls" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="fileType" class="form-label">File Type</label>
+                        <select class="form-select" id="fileType" name="fileType" required>
+                            <option value="">Select Type</option>
+                            <option value="Sent">Sent</option>
+                            <option value="Received">Received</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h4>Upload History</h4>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>File Type</th>
+                    <th>File Name</th>
+                    <th>Upload Date</th>
+                    <th>Total Rows</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var batch in Model)
+                    {
+                        <tr>
+                            <td>@batch.Id</td>
+                            <td>
+                                <span class="badge @(batch.FileType == "Sent" ? "bg-info" : "bg-success")">
+                                    @batch.FileType
+                                </span>
+                            </td>
+                            <td>@batch.FileName</td>
+                            <td>@batch.UploadedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@batch.TotalRows.ToString("N0")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">No uploads yet</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
