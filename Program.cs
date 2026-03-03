@@ -16,6 +16,8 @@ builder.Services.AddScoped<ExcelCompare.Application.Interfaces.IUploadBatchRepos
 builder.Services.AddScoped<ExcelCompare.Application.Services.BulkInsertService>();
 builder.Services.AddScoped<ExcelCompare.Application.Interfaces.IExcelUploadService, ExcelCompare.Application.Services.ExcelUploadService>();
 builder.Services.AddScoped<ExcelCompare.Application.Interfaces.IComparisonService, ExcelCompare.Application.Services.ComparisonService>();
+builder.Services.AddScoped<ExcelCompare.Application.Interfaces.IDuplicateDetectionService, ExcelCompare.Application.Services.DuplicateDetectionService>();
+builder.Services.AddScoped<ExcelCompare.Application.Interfaces.IDataVersioningService, ExcelCompare.Application.Services.DataVersioningService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

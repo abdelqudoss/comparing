@@ -2,23 +2,27 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using ExcelCompare.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace ExcelCompare.Application.Services;
 
 public class BulkInsertService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IConfiguration _configuration;
     private const int BatchSize = 10000;
 
-    public BulkInsertService(ApplicationDbContext context)
+    public BulkInsertService(ApplicationDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration;
     }
 
     public async Task BulkInsertSentRecordsAsync(
         int uploadBatchId,
         IEnumerable<Dictionary<string, object>> records,
-        IProgress<int>? progress = null)
+        IProgress<int>? progress = null,
+        bool isUpdate = false)
     {
         var dataTable = CreateSentRecordDataTable();
         int processedCount = 0;
@@ -62,7 +66,8 @@ public class BulkInsertService
     public async Task BulkInsertReceivedRecordsAsync(
         int uploadBatchId,
         IEnumerable<Dictionary<string, object>> records,
-        IProgress<int>? progress = null)
+        IProgress<int>? progress = null,
+        bool isUpdate = false)
     {
         var dataTable = CreateReceivedRecordDataTable();
         int processedCount = 0;
@@ -105,7 +110,7 @@ public class BulkInsertService
 
     private async Task ExecuteBulkCopyAsync(DataTable dataTable, string tableName)
     {
-        var connectionString = _context.Database.GetDbConnection().ConnectionString;
+        var connectionString = _configuration.GetConnectionString("DefaultConnection");
         
         using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync();

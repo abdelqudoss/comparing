@@ -1,0 +1,216 @@
+@model ExcelCompare.Application.Models.DuplicateDetectionResult
+
+@{
+    ViewData["Title"] = "⚠️ Duplicates Detected";
+    var fileName = ViewBag.FileName as string;
+    var fileType = ViewBag.FileType as string;
+}
+
+<div class="container mt-4">
+    <div class="card border-warning shadow-lg">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0">
+                <i class="bi bi-exclamation-triangle-fill"></i> Duplicate Records Detected
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><strong>File:</strong> @fileName (@fileType)</h5>
+                <p class="mb-0">We found duplicate records in this upload. Please review the details below and decide how to proceed.</p>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Within File Duplicates</h6>
+                            <h2 class="text-danger">@Model.WithinFileDuplicateCount</h2>
+                            <small>Duplicate records in uploaded file</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Cross-Batch Duplicates</h6>
+                            <h2 class="text-warning">@Model.CrossBatchDuplicateCount</h2>
+                            <small>Records matching existing data</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Total Duplicates</h6>
+                            <h2 class="text-primary">@Model.TotalDuplicateCount</h2>
+                            <small>Total affected records</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.DuplicatesByMem.Any())
+            {
+                <div class="mb-4">
+                    <h5><i class="bi bi-person-badge"></i> Duplicates by Member Number (Mem)</h5>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm table-striped">
+                            <thead class="sticky-top bg-white">
+                                <tr>
+                                    <th>Mem</th>
+                                    <th>Count</th>
+                                    <th>SN</th>
+                                    <th>Full Name</th>
+                                    <th>Phone</th>
+                                    <th>Conflicting Batch(es)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dup in Model.DuplicatesByMem.Take(50))
+                                {
+                                    <tr>
+                                        <td><strong>@dup.Mem</strong></td>
+                                        <td><span class="badge bg-danger">@dup.Count</span></td>
+                                        <td>@dup.Sn</td>
+                                        <td>@dup.FullName</td>
+                                        <td>@dup.Phone</td>
+                                        <td>
+                                            @if (dup.ConflictingBatchIds.Any())
+                                            {
+                                                <span class="text-warning">
+                                                    Batch @string.Join(", ", dup.ConflictingBatchIds)
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (Model.DuplicatesByMem.Count > 50)
+                    {
+                        <small class="text-muted">Showing first 50 of @Model.DuplicatesByMem.Count duplicates by Mem</small>
+                    }
+                </div>
+            }
+
+            @if (Model.DuplicatesByNid.Any())
+            {
+                <div class="mb-4">
+                    <h5><i class="bi bi-card-checklist"></i> Duplicates by National ID (Nid)</h5>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm table-striped">
+                            <thead class="sticky-top bg-white">
+                                <tr>
+                                    <th>Nid</th>
+                                    <th>Count</th>
+                                    <th>SN</th>
+                                    <th>Full Name</th>
+                                    <th>Phone</th>
+                                    <th>Conflicting Batch(es)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dup in Model.DuplicatesByNid.Take(50))
+                                {
+                                    <tr>
+                                        <td><strong>@dup.Nid</strong></td>
+                                        <td><span class="badge bg-danger">@dup.Count</span></td>
+                                        <td>@dup.Sn</td>
+                                        <td>@dup.FullName</td>
+                                        <td>@dup.Phone</td>
+                                        <td>
+                                            @if (dup.ConflictingBatchIds.Any())
+                                            {
+                                                <span class="text-warning">
+                                                    Batch @string.Join(", ", dup.ConflictingBatchIds)
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (Model.DuplicatesByNid.Count > 50)
+                    {
+                        <small class="text-muted">Showing first 50 of @Model.DuplicatesByNid.Count duplicates by Nid</small>
+                    }
+                </div>
+            }
+
+            <div class="alert alert-info">
+                <h6><i class="bi bi-lightbulb"></i> Recommendation:</h6>
+                <p>@Model.Recommendation</p>
+            </div>
+
+            <form method="post" asp-action="ProcessConfirmedUpload" enctype="multipart/form-data">
+                <input type="hidden" name="fileType" value="@fileType" />
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5>What would you like to do?</h5>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-arrow-clockwise"></i> Upload as UPDATE
+                                </h5>
+                                <p class="card-text">
+                                    Treat existing records as outdated. This upload contains updated information for those members.
+                                    The system will version the old records and insert new ones.
+                                </p>
+                                <button type="submit" name="action" value="proceed" 
+                                        class="btn btn-primary w-100">
+                                    <i class="bi bi-check-circle"></i> Proceed as Update
+                                </button>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" name="markAsUpdate" value="true" class="form-check-input" id="markAsUpdate">
+                                    <label class="form-check-label" for="markAsUpdate">
+                                        Mark this upload as an update
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">
+                                    <i class="bi bi-x-circle"></i> Cancel Upload
+                                </h5>
+                                <p class="card-text">
+                                    Stop this upload. Review your data and remove duplicates before uploading again.
+                                    No changes will be made to the database.
+                                </p>
+                                <button type="submit" name="action" value="cancel" 
+                                        class="btn btn-danger w-100">
+                                    <i class="bi bi-x-circle"></i> Cancel Upload
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Re-upload the file -->
+                <input type="file" name="file" style="display: none;" id="hiddenFile" />
+                <script>
+                    // Note: In production, store file server-side or in session
+                    // For now, user needs to re-select the file
+                </script>
+            </form>
+
+            <div class="alert alert-secondary mt-3">
+                <small>
+                    <strong>Note:</strong> In a production environment, large files would be temporarily stored server-side.
+                    For this demo, you may need to re-select the file if you choose to proceed.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

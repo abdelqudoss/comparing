@@ -18,7 +18,16 @@
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
+            <strong>Upload Failed</strong>
+            <pre style="white-space: pre-wrap; background-color: transparent; border: none; padding: 0; margin-top: 10px; font-family: inherit;">@TempData["Error"]</pre>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["Info"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -54,10 +63,12 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Type</th>
                     <th>File Type</th>
                     <th>File Name</th>
                     <th>Upload Date</th>
                     <th>Total Rows</th>
+                    <th>Duplicates</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,7 +77,25 @@
                     foreach (var batch in Model)
                     {
                         <tr>
-                            <td>@batch.Id</td>
+                            <td>
+                                <a href="#" class="text-decoration-none" title="View batch details">
+                                    <strong>@batch.Id</strong>
+                                </a>
+                            </td>
+                            <td>
+                                @if (batch.IsUpdate)
+                                {
+                                    <span class="badge bg-warning text-dark" title="This is an update to batch @batch.OriginalBatchId">
+                                        <i class="bi bi-arrow-clockwise"></i> Update
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">
+                                        <i class="bi bi-plus-circle"></i> New
+                                    </span>
+                                }
+                            </td>
                             <td>
                                 <span class="badge @(batch.FileType == "Sent" ? "bg-info" : "bg-success")">
                                     @batch.FileType
@@ -75,13 +104,16 @@
                             <td>@batch.FileName</td>
                             <td>@batch.UploadedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
                             <td>@batch.TotalRows.ToString("N0")</td>
+                            <td>
+                                <span class="text-muted">-</span>
+                            </td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center">No uploads yet</td>
+                        <td colspan="7" class="text-center">No uploads yet</td>
                     </tr>
                 }
             </tbody>

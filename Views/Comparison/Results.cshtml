@@ -47,6 +47,12 @@
                     <p><strong>Total Keys in Sent:</strong> @(Model.MissingRecords.Count + Model.ChangedRecords.Count + Model.UnchangedCount)</p>
                     <p><strong>Total Keys in Received:</strong> @(Model.NewRecords.Count + Model.ChangedRecords.Count + Model.UnchangedCount)</p>
                     <p><strong>Matching Keys (Unchanged Data):</strong> @Model.UnchangedCount</p>
+                    <hr />
+                    <p class="text-muted">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Note:</strong> To view duplicate records across batches, visit the 
+                        <a href="@Url.Action("Index", "DuplicateReport")" class="text-decoration-none">Duplicates Report</a> page.
+                    </p>
                 </div>
             </div>
         </div>
